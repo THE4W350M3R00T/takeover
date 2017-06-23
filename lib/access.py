@@ -32,8 +32,6 @@ def dot11pkt(pkt):
         if str(addr2) not in hiddenNets:
             print(str(addr2) + "\tHidden\t\t" + str(encryption))
             hiddenNets.append(addr2)
-    else:
+     else:
         print(str(bssid) + "\t" + str(ssid.decode()) + "\t" + str(encryption))
-    ssids[bssid] = encryption
-
-sniff(iface="wlan0mon", prn=dot11pkt)
+    ssids[bssid] = encryption 
