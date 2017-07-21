@@ -52,7 +52,7 @@ def attack(tgtIP, gateIP):
         print("[{0}*{2}][{1}INFO{2}] {3}Exiting...{2}".format(BLUE, LGREEN, RST, RD))
         sys.exit(1)
     else:
-        print("[{0}+{2}][{0}INFO{2}] {3}Gateway's MAC address found:{2} {4}{1}{2}".format(LGREEN, victimMac, RST, RD, GR))
+        print("[{0}+{2}][{0}INFO{2}] {3}Gateway's MAC address found:{2} {4}{1}{2}".format(LGREEN, gatewayMac, RST, RD, GR))
     
     print("[{0}+{2}][{0}INFO{2}] {1}Poisoning targets...{2}".format(LGREEN, RD, RST))
     while True:
