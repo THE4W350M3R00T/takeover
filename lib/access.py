@@ -1,8 +1,7 @@
 from colors import *
 from scapy.all import *
-import os, sys, time
+import sys, time
 import threading
-import getch
 
 ssids = {}
 hiddenNets = []
