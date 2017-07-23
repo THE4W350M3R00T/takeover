@@ -88,7 +88,7 @@ def synflood(port, tgtIP):
         logging.info(" Exiting...")
         sys.exit(0)
 
-def GETflood(port, tgtIP):
+def GETflood(tgtIP):
     conf.verb = 0
     count = 0
     try:
