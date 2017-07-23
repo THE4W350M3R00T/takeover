@@ -1,4 +1,4 @@
-from colors import *
+from lib.colors import *
 from scapy.all import *
 import os, sys, time
 import threading
