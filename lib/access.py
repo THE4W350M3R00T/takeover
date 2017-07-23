@@ -1,6 +1,6 @@
 from colors import *
 from scapy.all import *
-import sys, time
+import os, sys, time
 import threading
 
 ssids = {}
