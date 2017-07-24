@@ -1,4 +1,4 @@
-import argparse
+import argparse,os
 from lib.access import *
 from lib.kick import *
 from lib.DoS import *
@@ -16,7 +16,8 @@ if os.geteuid() != 0:
 try:
     import netifaces
 except:
-    os.system('pip3 install netifaces')
+    os.system('pip3 install netifaces > /dev/null')
+    import netifaces
 
 banner = '''{0}
  ___________   __       __   ___  _______    ______  ___      ___  _______   _______
