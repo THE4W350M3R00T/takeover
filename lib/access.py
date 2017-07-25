@@ -90,6 +90,8 @@ class wireless:
         while True:
             try:
                 sniff(iface=self.iface, prn=self.sniffer, count=2)
-                time.sleep(0.1)
+                time.sleep(0.01)
             except KeyboardInterrupt:
+                print("")
                 break
+
