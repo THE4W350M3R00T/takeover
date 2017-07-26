@@ -1,10 +1,12 @@
-import argparse,os
+import argparse
+import os
 from lib.access import *
 from lib.kick import *
 from lib.DoS import *
 from lib.recon import *
 from lib.attack import *
 from lib.mitm import *
+from lib.colors import *
 
 logging.basicConfig(level=logging.DEBUG, format="[{0}%(levelname)s{1}][{2}%(asctime)s{1}]{3}%(message)s{1}".format(LGREEN, RST, BLUE, RD), datefmt="%H:%M:%S")
 
@@ -111,7 +113,7 @@ def Main():
         else:
             port = 80
         if args.sockets:
-            socks = args.socks
+            socks = args.sockets
         else:
             socks = 100
         if not args.threads:
@@ -137,4 +139,3 @@ def Main():
 
 if __name__ == '__main__':
     Main()
-
