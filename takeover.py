@@ -1,10 +1,3 @@
-import argparse,os
-from lib.access import *
-from lib.kick import *
-from lib.DoS import *
-from lib.recon import *
-from lib.attack import *
-from lib.mitm import *
 
 logging.basicConfig(level=logging.DEBUG, format="[{0}%(levelname)s{1}][{2}%(asctime)s{1}]{3}%(message)s{1}".format(LGREEN, RST, BLUE, RD), datefmt="%H:%M:%S")
 
