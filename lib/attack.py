@@ -1,6 +1,5 @@
 from scapy.all import *
 from lib.colors import *
-from arpspoof import mac
 import logging
 import sys
 
