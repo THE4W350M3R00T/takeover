@@ -2,12 +2,14 @@ import argparse
 import os, sys, time
 import logging
 logging.getLogger('scapy.runtime').setLevel(logging.ERROR)
+
 try:
     import netifaces
     from scapy.all import *
 except ImportError as e:
     print(str(e))
     print("Please install the required modules")
+    sys.exit(1)
 
 from lib.access import *
 from lib.kick import *
@@ -19,7 +21,6 @@ from lib.colors import *
 import lib.interface as iface
 
 logging.basicConfig(level=logging.DEBUG, format="[{0}%(levelname)s{1}][{2}%(asctime)s{1}]{3}%(message)s{1}".format(LGREEN, RST, BLUE, RD), datefmt="%H:%M:%S")
-
 
 if os.geteuid() != 0:
     print("Please run as root: sudo {} [OPTION]".format(sys.argv[0]))
@@ -34,26 +35,29 @@ banner = '''{0}
     \:  | /   /  \   \ |: | \  \(:      "|\        /    \    /   (:      "||:  __   |
      \__|(___/    \___)(__|  \__)\_______) \ _____/      \__/     \_______)|__|  \___)
                                 
-                                ~Nothing is invulnerable~
+                            ~Take over a whole network~
 {2}
 '''.format(LRED, RD, RST)
 
 def argument_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--spoof", help="ARP", metavar='')
-    parser.add_argument("-t", "--target", help="Target to attack", metavar='')
-    parser.add_argument("-i", "--interface", help="Interface to use", metavar='')
-    parser.add_argument("-k", "--kick", help="Kick one/multiple/all people off your network", metavar='')
-    parser.add_argument("-d", "--deauth", help="Send deauth packets to target", metavar='')
-    parser.add_argument("-ws", "--wlansniff", help="Wireless sniffer to sniff AP's", action='store_true')
-    parser.add_argument("-D", "--DoS", help="DoS attacks (fraggle [LAN], pingflood, GETflood, SYNflood, slowloris)", metavar='')
-    parser.add_argument("-T", "--threads", help="Enter how many threads for DoS attack (default=20)", type=int, metavar='')
-    parser.add_argument("-p", "--port", help="Port to perform attack on", type=int, metavar='')
-    parser.add_argument("-S", "--sockets", help="Number of sockets to generate for slowloris attack (default=100)", type=int, metavar='')
-    parser.add_argument("-g", "--gateway", help="insert IP of gateway", metavar='')
+    attacks = parser.add_argument_group("Attacks")
+    recon = parser.add_argument_group("Reconnaissance")
+    info = parser.add_argument_group("Information")
+    attacks.add_argument("-s", "--spoof", help="ARP", metavar='')
+    info.add_argument("-t", "--target", help="Target to attack", metavar='')
+    info.add_argument("-i", "--interface", help="Interface to use", metavar='')
+    attacks.add_argument("-k", "--kick", help="Kick one/multiple/all people off your network", metavar='')
+    attacks.add_argument("-d", "--deauth", help="Send deauth packets to target", metavar='')
+    recon.add_argument("-ws", "--wlansniff", help="Wireless sniffer to sniff AP's", action='store_true')
+    attacks.add_argument("-D", "--DoS", help="DoS attacks (fraggle [LAN], pingflood, GETflood, SYNflood, slowloris)", metavar='')
+    info.add_argument("-T", "--threads", help="Enter how many threads for DoS attack (default=20)", type=int, metavar='')
+    info.add_argument("-p", "--port", help="Port to perform attack on", type=int, metavar='')
+    info.add_argument("-S", "--sockets", help="Number of sockets to generate for slowloris attack (default=100)", type=int, metavar='')
+    info.add_argument("-g", "--gateway", help="insert IP of gateway", metavar='')
     return parser.parse_args()
 
-def check_args(args, interface):
+def check_args(args):
     if args.spoof == "ARP" and args.target:
         if args.gateway:
             gateway = args.gateway
@@ -69,6 +73,14 @@ def check_args(args, interface):
         os.system('clear')
         print(banner)
         logging.debug(" Selected Wireless Sniffing")
+        if args.interface:
+            interface = args.interface
+        else:
+            try:
+                interface = iface.interfaces().checking()
+            except:
+                logging.error(" Couldn't get interface into monitor mode, please do it manually")
+                sys.exit(1)
         inface = interface
         logging.debug(" Interface: {}\n".format(inface))
         wsniffer = wireless(inface)
@@ -108,15 +120,7 @@ def check_args(args, interface):
 def Main():
     print(banner)
     args = argument_parser()
-    if args.interface:
-        interface = args.interface
-    else:
-        try:
-            interface = iface.interfaces().checking()
-        except:
-            logging.error(" Couldn't get interface into monitor mode, please do it manually")
-            sys.exit(1)
-    check_args(args, interface)
+    check_args(args)
         
 if __name__ == '__main__':
     Main()
