@@ -1,5 +1,14 @@
 import argparse
-import os
+import os, sys, time
+import logging
+logging.getLogger('scapy.runtime').setLevel(logging.ERROR)
+try:
+    import netifaces
+    from scapy.all import *
+except ImportError as e:
+    print(str(e))
+    print("Please install the required modules")
+
 from lib.access import *
 from lib.kick import *
 from lib.DoS import *
@@ -7,6 +16,7 @@ from lib.recon import *
 from lib.attack import *
 from lib.mitm import *
 from lib.colors import *
+import lib.interface as iface
 
 logging.basicConfig(level=logging.DEBUG, format="[{0}%(levelname)s{1}][{2}%(asctime)s{1}]{3}%(message)s{1}".format(LGREEN, RST, BLUE, RD), datefmt="%H:%M:%S")
 
@@ -14,12 +24,6 @@ logging.basicConfig(level=logging.DEBUG, format="[{0}%(levelname)s{1}][{2}%(asct
 if os.geteuid() != 0:
     print("Please run as root: sudo {} [OPTION]".format(sys.argv[0]))
     sys.exit(1)
-
-try:
-    import netifaces
-except:
-    os.system('pip3 install netifaces > /dev/null')
-    import netifaces
 
 banner = '''{0}
  ___________   __       __   ___  _______    ______  ___      ___  _______   _______
@@ -32,42 +36,9 @@ banner = '''{0}
                                 
                                 ~Nothing is invulnerable~
 {2}
-'''.format(LCYAN, CY, RST)
+'''.format(LRED, RD, RST)
 
-checking = []
-
-def monitor_mode(iface):
-    logging.info(" Turning on monitor mode...")
-    ans = os.system("airmong-ng check kill")
-    if ans == 32512:
-        logging.warning(" aircrack-ng not installed")
-        logging.info(" Trying other option...")
-        os.system("ifconfig {} down".format(iface))
-        os.system("iwconfig {} mode monitor".format(iface))
-        os.system("ifconfig {} up".format(iface))
-    else:
-        os.system("airmong-ng start {}".format(iface))
-    checking.append("X")
-    if len(checking) > 1:
-        logging.warning(" Couldn't get interface into monitor mode.") 
-        logging.info(" Exiting...")
-        sys.exit(1)
-    checkinterface()
-
-def checkinterface():
-    ifaces = netifaces.interfaces()
-    wlan = ''
-    for i in ifaces:
-        if i.startswith("wl") or i.startswith("ath"):
-            wlan = i  
-    if wlan == '':
-        wlan = ifaces[2]
-    if "mon" in wlan:
-        return wlan
-    else:
-        monitor_mode(wlan)
-
-def Main():
+def argument_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--spoof", help="ARP", metavar='')
     parser.add_argument("-t", "--target", help="Target to attack", metavar='')
@@ -80,8 +51,9 @@ def Main():
     parser.add_argument("-p", "--port", help="Port to perform attack on", type=int, metavar='')
     parser.add_argument("-S", "--sockets", help="Number of sockets to generate for slowloris attack (default=100)", type=int, metavar='')
     parser.add_argument("-g", "--gateway", help="insert IP of gateway", metavar='')
-    args = parser.parse_args()
-    print(banner)
+    return parser.parse_args()
+
+def check_args(args, interface):
     if args.spoof == "ARP" and args.target:
         if args.gateway:
             gateway = args.gateway
@@ -97,12 +69,8 @@ def Main():
         os.system('clear')
         print(banner)
         logging.debug(" Selected Wireless Sniffing")
-        if args.interface:
-            time.sleep(0.5)
-            inface = args.interface
-        else:
-            inface = checkinterface()
-            logging.debug(" Interface: {}\n".format(inface))
+        inface = interface
+        logging.debug(" Interface: {}\n".format(inface))
         wsniffer = wireless(inface)
         wsniffer.Main()
     if args.DoS and args.target:
@@ -137,5 +105,18 @@ def Main():
             logging.debug(" Selected ping flood attack")
             DOSthread(pingflood, tgt, threads)
 
+def Main():
+    print(banner)
+    args = argument_parser()
+    if args.interface:
+        interface = args.interface
+    else:
+        try:
+            interface = iface.interfaces().checking()
+        except:
+            logging.error(" Couldn't get interface into monitor mode, please do it manually")
+            sys.exit(1)
+    check_args(args, interface)
+        
 if __name__ == '__main__':
     Main()
