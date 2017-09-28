@@ -17,7 +17,7 @@ from lib.recon import *
 from lib.attack import *
 from lib.mitm import *
 from lib.colors import *
-import lib.interface as iface
+#import lib.interface as iface
 
 logging.basicConfig(level=logging.DEBUG, format="[{0}%(levelname)s{1}][{2}%(asctime)s{1}]{3}%(message)s{1}".format(LGREEN, RST, BLUE, RD), datefmt="%H:%M:%S")
 
